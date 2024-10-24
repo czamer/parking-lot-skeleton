@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+    restart: on-failure
+    tty: true
+    depends_on:
+      - mysql
+    environment:
+      - MYSQL_HOST=mysql
+      - MYSQL_DATABASE=interview
+      - MYSQL_USERNAME=interview
+      - MYSQL_PASSWORD=interview-password
+    ports:
+      - 8000:8000
+    volumes:
+    - ./:/app
+
+  mysql:
+    image: mysql:5.7
+    healthcheck:
+      test: mysqladmin ping -u $$MYSQL_USER --password=$$MYSQL_PASSWORD -h 127.0.0.1
+      timeout: 20s
+      retries: 10
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - ./scripts/mysql:/docker-entrypoint-initdb.d
